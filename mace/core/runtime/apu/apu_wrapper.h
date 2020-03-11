@@ -37,11 +37,14 @@ struct tensor_info {
     int size;
     float scale;
     int zero_point;
+    apu_data_type data_type;
 };
 
  public:
     explicit ApuWrapper(Device *device);
-    bool Init(const NetDef& net_def, unsigned const char *model_data);
+    bool Init(const NetDef& net_def, unsigned const char *model_data = nullptr,
+              const char *file_name = nullptr,
+              bool load = false, bool store = false);
     bool Run(const std::map<std::string, Tensor *> &input_tensors,
              std::map<std::string, Tensor *> *output_tensors);
     bool Uninit();
@@ -50,6 +53,12 @@ struct tensor_info {
     apu_data_type MapToApuDataType(DataType mace_type);
     apu_pooling_mode MapToApuPoolingMode(int mace_mode);
     apu_eltwise_mode MapToApuEltwiseMode(int mace_mode);
+    void Quantize16bit(const float *input, const index_t size,
+                       float scale, int32_t zero_point, int16_t *output);
+    void Dequantize16bit(const int16_t *input, const index_t size,
+                         const float scale, const int32_t zero_point,
+                         float *output);
+    int GetByteNum(apu_data_type data_type);
 
  private:
     ApuFrontend* frontend;
