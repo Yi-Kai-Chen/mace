@@ -86,7 +86,7 @@ bool ApuWrapper::Init(const NetDef &net_def, unsigned const char *model_data,
 
   // parse model argument
   int const_data_num = 0;
-  int apu_data_type;
+  int apu_data_type = -1;
   for (auto arg : net_def.arg()) {
     if (arg.name().compare("const_data_num") == 0) {
       const_data_num = arg.i();
@@ -149,8 +149,8 @@ bool ApuWrapper::Init(const NetDef &net_def, unsigned const char *model_data,
                              std::default_delete<uint8_t[]>());
     for (auto op_def : net_def.op()) {
       if (output_info.name() == op_def.output(0)) {
-        if (apu_data_type == static_cast<int>(APU_DATA_TYPE_UINT8) ||
-            apu_data_type == static_cast<int>(APU_DATA_TYPE_INT16)) {
+        if (info.data_type == static_cast<int>(APU_DATA_TYPE_UINT8) ||
+            info.data_type == static_cast<int>(APU_DATA_TYPE_INT16)) {
           info.scale = op_def.quantize_info(0).scale();
           info.zero_point = op_def.quantize_info(0).zero_point();
         } else {
@@ -311,7 +311,6 @@ bool ApuWrapper::Run(const std::map<std::string, Tensor *> &input_tensors,
     int byte_per_element = GetByteNum(output_infos[i].data_type);
     MACE_ASSERT(element_size == static_cast<int>(tensor->size()),
                 "Wrong output size");
-
     // dequantize
     if (output_infos[i].data_type == APU_DATA_TYPE_INT16) {
       Dequantize16bit(
