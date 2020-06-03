@@ -101,7 +101,7 @@ bool ApuWrapper::Init(const NetDef &net_def, unsigned const char *model_data,
     tensor.tensor_id = input_info.node_id();
     tensor.tensor_type = APU_TENSOR_MODEL_INPUT;
     tensor.data_type = MapToApuDataType(static_cast<DataType>(apu_data_type));
-    tensor.scale = input_info.has_scale() ? input_info.scale() : 0.0f;
+    tensor.scale = input_info.has_scale() ? input_info.scale() : -1.0f;
     tensor.zero_point = input_info.has_zero_point() ?
                             input_info.zero_point() : 0;
     tensor.dim_size = input_info.dims_size();
@@ -242,6 +242,10 @@ bool ApuWrapper::Init(const NetDef &net_def, unsigned const char *model_data,
         op.act_mode = APU_ACT_RELU;
       } else if (activation.compare("RELUX") == 0 && max_limit == 6.0) {
         op.act_mode = APU_ACT_RELU6;
+      } else if (activation.compare("SIGMOID") == 0) {
+        op.act_mode = APU_ACT_SIGMOID;
+      } else if (activation.compare("TANH") == 0) {
+        op.act_mode = APU_ACT_TANH;
       } else {
         op.act_mode = APU_ACT_NONE;
       }
