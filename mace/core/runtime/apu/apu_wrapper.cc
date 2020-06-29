@@ -259,7 +259,6 @@ bool ApuWrapper::Init(const NetDef &net_def, unsigned const char *model_data,
                  output_tensors.size(), output_tensors.data(),
                  ops.size(), ops.data(),
                  print_model, file_name, load, store);
-  MACE_CHECK(ret == true, "apu init graph failed");
   cached_op_inputs.clear();
   return ret;
 }
